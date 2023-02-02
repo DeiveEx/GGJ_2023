@@ -16,11 +16,13 @@ public class Cauldron_Tester : MonoBehaviour
     }
     
     [SerializeField] private List<IngredientHolder> _availableIngredients = new();
+    [SerializeField] private List<SicknessSO> _sicknesses = new();
     [SerializeField] private CauldronCraftStation _cauldron;
     [SerializeField] private Transform _buttonParent;
     [SerializeField] private Button _buttonPrefab;
     [SerializeField] private TMP_Text _ingredientText;
     [SerializeField] private TMP_Text _propertyText;
+    [SerializeField] private TMP_Text _sicknessText;
 
     private void Start()
     {
@@ -52,8 +54,9 @@ public class Cauldron_Tester : MonoBehaviour
 
     public void Cook()
     {
+        StringBuilder sb = new StringBuilder();
+
         var result = _cauldron.EvaluateRecipe();
-        _cauldron.ClearIngredients();
         UpdateInfo();
 
         if (result == null)
@@ -62,14 +65,42 @@ public class Cauldron_Tester : MonoBehaviour
             return;
         }
 
-        StringBuilder sb = new StringBuilder("Result:\n");
+        sb.Append("Result:\n");
+        sb.AppendLine(result.ToString());
+
+        string resultText = sb.ToString();
+        sb.Clear();
         
-        foreach (var ingredient in result)
+        foreach (var sickness in _sicknesses)
         {
-            sb.AppendLine($"- {ingredient.ingredientName}");
+            sb.Append($"SicknessName: {sickness.SicknessInfo.SicknessName}\n");
+            
+            sb.Append($"- Cure requirements:\n");
+
+            foreach (var cureRequirement in sickness.SicknessInfo.CureRequirements)
+            {
+                sb.Append($"-- {cureRequirement.property}: {cureRequirement.amount}\n");
+            }
+            
+            bool canCure = DoesPotionCureSickness(result, sickness.SicknessInfo, out var leftovers);
+            sb.Append($"- Does potion cure sickness: {canCure}\n");
+
+            if (canCure && leftovers != null)
+            {
+                sb.Append($"- Leftover Effects:\n");
+                foreach (var leftoverEffect in leftovers)
+                {
+                    sb.Append($"-- {leftoverEffect.property}: {leftoverEffect.amount}\n");
+                }
+            }
+            
+            sb.Append("\n");
         }
 
-        UpdateInfo(sb.ToString());
+        string sicknessText = sb.ToString();
+        sb.Clear();
+        
+        UpdateInfo(resultText, "", sicknessText);
     }
 
     private void UpdateButton(Button button, IngredientHolder selectedIngredient)
@@ -77,48 +108,114 @@ public class Cauldron_Tester : MonoBehaviour
         button.interactable = selectedIngredient.available > 0;
 
         var buttonText = button.GetComponentInChildren<TMP_Text>();
-        buttonText.text = $"{selectedIngredient.ingredient.IngredientInfo.ingredientName}: {selectedIngredient.available}";
+        buttonText.text = $"{selectedIngredient.ingredient.IngredientInfo.IngredientName}: {selectedIngredient.available}";
     }
 
-    private void UpdateInfo(string forceMessage = null)
+    private void UpdateInfo(string ingredientsMessage = null, string propertiesMessage = null, string sicknessMessage = null)
     {
         _ingredientText.text = "";
         _propertyText.text = "";
-        
-        if (forceMessage != null)
-        {
-            _ingredientText.text = forceMessage;
-            return;
-        }
-
-        var ingredients = _cauldron.CurrentIngredients.ToList();
-
-        if (!ingredients.Any())
-        {
-            _ingredientText.text = "No ingredients";
-            return;
-        }
+        _sicknessText.text = "";
 
         StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Ingredients:");
 
-        foreach (var ingredient in ingredients)
+        //Ingredients
+        if (ingredientsMessage != null)
         {
-            sb.AppendLine($"- {ingredient.ingredientName}");
+            sb.Append(ingredientsMessage);
+        }
+        else
+        {
+            var ingredients = _cauldron.CurrentIngredients.ToList();
+
+            if (!ingredients.Any())
+            {
+                _ingredientText.text = "No ingredients";
+                return;
+            }
+
+            sb.AppendLine("Ingredients:");
+
+            foreach (var ingredient in ingredients)
+            {
+                sb.AppendLine($"- {ingredient.IngredientName}");
+            }
         }
 
         _ingredientText.text = sb.ToString();
-
-        var values = Helper.GetPropertiesFromIngredients(ingredients);
-
         sb.Clear();
-        sb.AppendLine("Recipe values:");
 
-        foreach (var value in values)
+        //Properties
+        if (propertiesMessage != null)
         {
-            sb.AppendLine($"- {value.Key}: {value.Value}");
+            sb.Append(propertiesMessage);
+        }
+        else
+        {
+            var properties = _cauldron.CurrentProperties;
+
+            sb.AppendLine("Recipe values:");
+
+            foreach (var property in properties)
+            {
+                sb.AppendLine($"- {property.Key}: {property.Value}");
+            }
         }
 
         _propertyText.text = sb.ToString();
+        sb.Clear();
+        
+        //Sicknesses
+        if (sicknessMessage != null)
+        {
+            sb.Append(sicknessMessage);
+        }
+        else
+        {
+            foreach (var sickness in _sicknesses)
+            {
+                sb.Append($"SicknessName: {sickness.SicknessInfo.SicknessName}\n");
+                sb.Append($"- Days to kill: {sickness.SicknessInfo.DaysToKill}\n");
+                sb.Append($"- Cure requirements:\n");
+
+                foreach (var cureRequirement in sickness.SicknessInfo.CureRequirements)
+                {
+                    sb.Append($"-- {cureRequirement.property}: {cureRequirement.amount}\n");
+                }
+            
+                sb.Append("\n");
+            }
+        }
+
+        _sicknessText.text = sb.ToString();
+    }
+
+    private bool DoesPotionCureSickness(CraftIngredient potion, Sickness sickness, out IEnumerable<PropertySpec> leftoverEffects)
+    {
+        leftoverEffects = null;
+        var leftovers = new List<PropertySpec>();
+
+        foreach (var cureRequirement in sickness.CureRequirements)
+        {
+            var potionProperty = potion.Properties.FirstOrDefault(x => x.property == cureRequirement.property);
+
+            if (potionProperty == null)
+                return false;
+
+            if (potionProperty.amount < cureRequirement.amount)
+                return false;
+
+            if (potionProperty.amount > cureRequirement.amount)
+            {
+                leftovers.Add(new PropertySpec()
+                {
+                    property = potionProperty.property,
+                    amount = potionProperty.amount - cureRequirement.amount
+                });
+            }
+        }
+
+        leftoverEffects = leftovers;
+        return true;
     }
 }
