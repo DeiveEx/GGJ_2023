@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SimpleSingleton<GameManager>
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private PotionManager _potionManager;
+    
+    private Inventory _inventory = new();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Inventory Inventory => _inventory;
+    public PotionManager PotionManager => _potionManager;
 }

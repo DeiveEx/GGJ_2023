@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,48 +12,14 @@ public class CauldronCraftStation : MonoBehaviour
 
     public IReadOnlyDictionary<IngredientPropertySO, PropertySpec> CurrentProperties => _currentProperties;
 
+    public event EventHandler onCauldronUpdated; 
+
     public void AddIngredient(CraftIngredient ingredient)
     {
         _currentIngredients.Add(ingredient);
-
-        //We create a duplicate list of properties
-        var propertyListClone = ingredient.Properties.Select(x => new PropertySpec()
-        {
-            property = x.property,
-            amount = x.amount
-        }).ToList();
         
-        // //Then we cancel any existing properties, removing any property that was used to cancel another property
-        // for (int i = 0; i < propertyListClone.Count; i++)
-        // {
-        //     var ingredientProperty = propertyListClone[i];
-        //     
-        //     foreach (var cancelTarget in ingredientProperty.property.CancelList)
-        //     {
-        //         if (_currentProperties.TryGetValue(cancelTarget, out var targetProperty))
-        //         {
-        //             int amountToCancel = Mathf.Min(ingredientProperty.amount, targetProperty.amount);
-        //             targetProperty.amount -= amountToCancel;
-        //             ingredientProperty.amount -= amountToCancel;
-        //             
-        //             Debug.Log($"[{ingredient.IngredientName}] has property [{ingredientProperty.property.PropertyName}], which cancelled [{amountToCancel}] units of [{targetProperty.property.PropertyName}]");
-        //
-        //             if (targetProperty.amount <= 0)
-        //             {
-        //                 _currentProperties.Remove(cancelTarget);
-        //             }
-        //
-        //             if (ingredientProperty.amount == 0)
-        //             {
-        //                 propertyListClone.RemoveAt(i);
-        //                 i--;
-        //             }
-        //         }
-        //     }
-        // }
-        
-        //Finally, with whatever is remaining in the list, we add to the current list of properties
-        foreach (var ingredientProperty in propertyListClone)
+        //Add the properties from the ingredient
+        foreach (var ingredientProperty in ingredient.Properties)
         {
             if (!_currentProperties.ContainsKey(ingredientProperty.property))
             {
@@ -65,17 +32,47 @@ public class CauldronCraftStation : MonoBehaviour
 
             _currentProperties[ingredientProperty.property].amount += ingredientProperty.amount;
         }
+        
+        //Calculate any property that cancel each other
+        foreach (var currentProperty in _currentProperties.Values)
+        {
+            foreach (var cancelTarget in currentProperty.property.CancelList)
+            {
+                if (_currentProperties.TryGetValue(cancelTarget, out var targetProperty))
+                {
+                    int amountToCancel = Mathf.Min(currentProperty.amount, targetProperty.amount);
+                    
+                    if(amountToCancel <= 0)
+                        continue;
+                    
+                    currentProperty.amount -= amountToCancel;
+                    targetProperty.amount -= amountToCancel;
+                }
+            }
+        }
+        
+        //Remove any zeroed properties
+        _currentProperties = _currentProperties
+            .Where(x => x.Value.amount > 0)
+            .ToDictionary(x => x.Key, y => y.Value);
+        
+        onCauldronUpdated?.Invoke(this, EventArgs.Empty);
+        Debug.Log($"Added {ingredient.IngredientName}");
     }
 
     public CraftIngredient EvaluateRecipe()
     {
+        if (_currentProperties.Count == 0)
+            return null;
+        
         CraftIngredient potion = new(
-            "Result Potion", //TODO how to name potions?
+            "Potion", //TODO how to name potions?
             _currentProperties.Select(x => new PropertySpec()
             {
                 property = x.Key,
                 amount = x.Value.amount
-            })
+            }),
+            true
         );
 
         _currentIngredients.Clear();
