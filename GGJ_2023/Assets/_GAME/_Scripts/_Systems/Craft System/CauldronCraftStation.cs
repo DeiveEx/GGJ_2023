@@ -57,7 +57,6 @@ public class CauldronCraftStation : MonoBehaviour
             .ToDictionary(x => x.Key, y => y.Value);
         
         onCauldronUpdated?.Invoke(this, EventArgs.Empty);
-        Debug.Log($"Added {ingredient.IngredientName}");
     }
 
     public CraftIngredient EvaluateRecipe()

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PotionManager : MonoBehaviour
+public class PotionManager : ManagerBase
 {
     [Serializable]
     public class IngredientHolder
@@ -25,16 +25,20 @@ public class PotionManager : MonoBehaviour
 
     private Inventory Inventory => GameManager.Instance.Inventory;
 
-    private void Start()
+    public override void Init()
     {
         AddInitialIngredients();
-        UpdateUI();
 
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         _cauldron.onCauldronUpdated += (sender, args) => UpdateUI();
     }
-    
+
+    protected override void OnShow()
+    {
+        UpdateUI();
+    }
+
     private void AddInitialIngredients()
     {
         foreach (var initialIngredient in _initialIngredients)
@@ -79,7 +83,8 @@ public class PotionManager : MonoBehaviour
 
             if (item.Key.IsPotion)
             {
-                button.transform.SetParent(_potionParent);
+                button.transform.SetParent(_potionParent, false);
+                
                 button.onClick.AddListener(() =>
                 {
                     ShowPotionInfo(item.Key);
@@ -88,7 +93,8 @@ public class PotionManager : MonoBehaviour
             else
             {
                 buttonTxt += $": {item.Value}";
-                button.transform.SetParent(_ingredientParent);
+                button.transform.SetParent(_ingredientParent, false);
+                
                 button.onClick.AddListener(() =>
                 {
                     _cauldron.AddIngredient(item.Key);
