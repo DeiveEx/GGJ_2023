@@ -4,19 +4,10 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-public enum IngredientProperty
-{
-    none = 0,
-    property1 = 1,
-    property2 = 2,
-    property3 = 3,
-    property4 = 4,
-}
-
 [Serializable]
 public class PropertySpec
 {
-    public IngredientProperty property;
+    public IngredientPropertySO property;
     public int amount;
 }
 
@@ -41,7 +32,7 @@ public class CraftIngredient
 
         foreach (var property in _properties)
         {
-            sb.Append($"\n- {property.property}: {property.amount}");
+            sb.Append($"\n- {property.property.PropertyName}: {property.amount}");
         }
         
         return sb.ToString();

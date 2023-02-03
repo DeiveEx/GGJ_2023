@@ -79,7 +79,7 @@ public class Cauldron_Tester : MonoBehaviour
 
             foreach (var cureRequirement in sickness.SicknessInfo.CureRequirements)
             {
-                sb.Append($"-- {cureRequirement.property}: {cureRequirement.amount}\n");
+                sb.Append($"-- {cureRequirement.property.PropertyName}: {cureRequirement.amount}\n");
             }
             
             bool canCure = DoesPotionCureSickness(result, sickness.SicknessInfo, out var leftovers);
@@ -90,7 +90,7 @@ public class Cauldron_Tester : MonoBehaviour
                 sb.Append($"- Leftover Effects:\n");
                 foreach (var leftoverEffect in leftovers)
                 {
-                    sb.Append($"-- {leftoverEffect.property}: {leftoverEffect.amount}\n");
+                    sb.Append($"-- {leftoverEffect.property.PropertyName}: {leftoverEffect.amount}\n");
                 }
             }
             
@@ -158,7 +158,7 @@ public class Cauldron_Tester : MonoBehaviour
 
             foreach (var property in properties)
             {
-                sb.AppendLine($"- {property.Key}: {property.Value}");
+                sb.AppendLine($"- {property.Key.PropertyName}: {property.Value.amount}");
             }
         }
 
@@ -180,7 +180,7 @@ public class Cauldron_Tester : MonoBehaviour
 
                 foreach (var cureRequirement in sickness.SicknessInfo.CureRequirements)
                 {
-                    sb.Append($"-- {cureRequirement.property}: {cureRequirement.amount}\n");
+                    sb.Append($"-- {cureRequirement.property.PropertyName}: {cureRequirement.amount}\n");
                 }
             
                 sb.Append("\n");
@@ -195,22 +195,38 @@ public class Cauldron_Tester : MonoBehaviour
         leftoverEffects = null;
         var leftovers = new List<PropertySpec>();
 
-        foreach (var cureRequirement in sickness.CureRequirements)
+        foreach (var potionProperty in potion.Properties)
         {
-            var potionProperty = potion.Properties.FirstOrDefault(x => x.property == cureRequirement.property);
+            //Check if this sickness needs this property
+            var cureRequirement = sickness.CureRequirements.FirstOrDefault(x => x.property == potionProperty.property);
 
-            if (potionProperty == null)
-                return false;
-
-            if (potionProperty.amount < cureRequirement.amount)
-                return false;
-
-            if (potionProperty.amount > cureRequirement.amount)
+            if (cureRequirement != null)
             {
+                //If the amount is equal, the potion is still valid but has no leftovers, so we just continue
+                if (potionProperty.amount == cureRequirement.amount)
+                    continue;
+                
+                //if the amount is lower, the potion is invalid
+                if (potionProperty.amount < cureRequirement.amount)
+                    return false;
+                
+                //if the amount is greater, the potion is still valid and we have some leftovers
+                if (potionProperty.amount > cureRequirement.amount)
+                {
+                    leftovers.Add(new PropertySpec()
+                    {
+                        property = potionProperty.property,
+                        amount = potionProperty.amount - cureRequirement.amount
+                    });
+                }
+            }
+            else
+            {
+                //If this property does nothing to the sickness, it's a leftover
                 leftovers.Add(new PropertySpec()
                 {
                     property = potionProperty.property,
-                    amount = potionProperty.amount - cureRequirement.amount
+                    amount = potionProperty.amount
                 });
             }
         }
