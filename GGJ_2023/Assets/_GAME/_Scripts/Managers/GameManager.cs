@@ -1,18 +1,58 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SimpleSingleton<GameManager>
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private PotionManager _potionManager;
+    [SerializeField] private PatientManager _patientManager;
+    [SerializeField] private FarmManager _farmManager;
+    
+    private Inventory _inventory = new();
+    private ManagerBase _currentManager;
+
+    public Inventory Inventory => _inventory;
+    public PotionManager PotionManager => _potionManager;
+    public PatientManager PatientManager => _patientManager;
+    public FarmManager FarmManager => _farmManager;
+
+    private void Start()
     {
+        _potionManager.Init();
+        _potionManager.Hide();
         
+        _patientManager.Init();
+        _patientManager.Hide();
+        
+        _farmManager.Init();
+        _farmManager.Hide();
+        
+        ShowPatientScreen();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ShowPotionScreen()
     {
-        
+        HideCurrentManager();
+        _potionManager.Show();
+        _currentManager = _potionManager;
+    }
+
+    public void ShowPatientScreen()
+    {
+        HideCurrentManager();
+        _patientManager.Show();
+        _currentManager = _patientManager;
+    }
+
+    public void ShowFarmScreen()
+    {
+        HideCurrentManager();
+        _farmManager.Show();
+        _currentManager = _farmManager;
+    }
+
+    private void HideCurrentManager()
+    {
+        if(_currentManager != null)
+            _currentManager.Hide();
     }
 }
