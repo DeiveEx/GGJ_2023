@@ -195,6 +195,8 @@ public class Cauldron_Tester : MonoBehaviour
         leftoverEffects = null;
         var leftovers = new List<PropertySpec>();
 
+        int requirementCount = sickness.CureRequirements.Count();
+        
         foreach (var potionProperty in potion.Properties)
         {
             //Check if this sickness needs this property
@@ -202,22 +204,24 @@ public class Cauldron_Tester : MonoBehaviour
 
             if (cureRequirement != null)
             {
-                //If the amount is equal, the potion is still valid but has no leftovers, so we just continue
-                if (potionProperty.amount == cureRequirement.amount)
-                    continue;
-                
-                //if the amount is lower, the potion is invalid
+                //If the amount is lower, the potion is invalid
                 if (potionProperty.amount < cureRequirement.amount)
                     return false;
                 
-                //if the amount is greater, the potion is still valid and we have some leftovers
-                if (potionProperty.amount > cureRequirement.amount)
+                //If the amount is greater or equal, the potion is still valid
+                if (potionProperty.amount >= cureRequirement.amount)
                 {
-                    leftovers.Add(new PropertySpec()
+                    requirementCount--;
+                    
+                    //if the amount is greater, we have some leftovers
+                    if (potionProperty.amount > cureRequirement.amount)
                     {
-                        property = potionProperty.property,
-                        amount = potionProperty.amount - cureRequirement.amount
-                    });
+                        leftovers.Add(new PropertySpec()
+                        {
+                            property = potionProperty.property,
+                            amount = potionProperty.amount - cureRequirement.amount
+                        });
+                    }
                 }
             }
             else
@@ -230,6 +234,10 @@ public class Cauldron_Tester : MonoBehaviour
                 });
             }
         }
+
+        //Check if we fulfilled all requirements for the sickness
+        if (requirementCount != 0)
+            return false;
 
         leftoverEffects = leftovers;
         return true;
