@@ -1,18 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlantSO : MonoBehaviour
+[CreateAssetMenu(fileName = "Plant", menuName = "Custom/New Plant")]
+public class PlantSO : ScriptableObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Plant _plantInfo;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Plant PlantInfo => _plantInfo;
 }

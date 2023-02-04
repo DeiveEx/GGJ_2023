@@ -20,7 +20,6 @@ public class PotionManager : ManagerBase
     [SerializeField] private Transform _potionParent;
     [SerializeField] private TMP_Text _itemText;
     [SerializeField] private TMP_Text _cauldronText;
-    [SerializeField] private List<IngredientHolder> _initialIngredients = new();
 
     private List<Button> _buttons = new();
     private CraftIngredient _selectedIngredient;
@@ -29,8 +28,6 @@ public class PotionManager : ManagerBase
 
     public override void Init()
     {
-        AddInitialIngredients();
-
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         _cauldron.onCauldronUpdated += (sender, args) => UpdateUI();
@@ -43,22 +40,13 @@ public class PotionManager : ManagerBase
         
         _cauldron.AddIngredient(_selectedIngredient);
         Inventory.RemoveItem(_selectedIngredient);
+
+        _selectedIngredient = null;
     }
 
     protected override void OnShow()
     {
         UpdateUI();
-    }
-
-    private void AddInitialIngredients()
-    {
-        foreach (var initialIngredient in _initialIngredients)
-        {
-            for (int i = 0; i < initialIngredient.available; i++)
-            {
-                GameManager.Instance.Inventory.AddItem(initialIngredient.ingredient.IngredientInfo);
-            }
-        }
     }
 
     public void Cook()

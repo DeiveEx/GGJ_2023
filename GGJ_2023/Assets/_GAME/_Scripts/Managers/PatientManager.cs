@@ -102,6 +102,9 @@ public class PatientManager : ManagerBase
 
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
         }
+
+        _selectedPatient = null;
+        _selectedPotion = null;
         
         UpdateUI();
         Debug.Log(sb.ToString());
