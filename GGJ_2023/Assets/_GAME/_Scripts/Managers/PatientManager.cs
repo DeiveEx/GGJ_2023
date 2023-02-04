@@ -97,7 +97,7 @@ public class PatientManager : ManagerBase
             
             foreach (var leftoverEffect in leftoverEffects)
             {
-                sb.Append($"- {leftoverEffect.property}: {leftoverEffect.amount}\n");
+                sb.Append($"- {leftoverEffect.property.PropertyName}: {leftoverEffect.amount}\n");
             }
 
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
