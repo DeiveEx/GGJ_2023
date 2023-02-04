@@ -258,6 +258,11 @@ public class PatientManager : ManagerBase
 
     private Sickness GetSicknessFromProperties(IEnumerable<PropertySpec> properties)
     {
+        foreach (var sicknessSo in _availableSickness)
+        {
+            
+        }
+        
         Debug.LogError($"No sickness found with the given properties!");
         return null;
     }
@@ -290,7 +295,7 @@ public class PatientManager : ManagerBase
         //Potions
         foreach (var item in Inventory.CurrentItems.Keys)
         {
-            if(!item.IsPotion)
+            if(item.ItemType != ItemType.Potion)
                 continue;
             
             var button = Instantiate(_buttonPrefab, _potionParent, false);

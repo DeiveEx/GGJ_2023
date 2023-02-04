@@ -92,7 +92,7 @@ public class PotionManager : ManagerBase
             var button = Instantiate(_buttonPrefab);
             string buttonTxt = $"{item.Key.IngredientName}";
 
-            if (item.Key.IsPotion)
+            if (item.Key.ItemType == ItemType.Potion)
             {
                 button.transform.SetParent(_potionParent, false);
                 
