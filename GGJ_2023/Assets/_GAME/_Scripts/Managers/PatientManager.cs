@@ -120,6 +120,30 @@ public class PatientManager : ManagerBase
 
     private void UpdateCurrentPatientList()
     {
+        CheckForReturningPatients();
+        
+        //Check for deaths
+        var deadPatients = CheckCurrentPatientsDeaths();
+
+        foreach (var deadPatient in deadPatients)
+        {
+            GameManager.Instance.AddMistake();
+            
+            string causeOfDeath = null;
+
+            if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
+                causeOfDeath = deadPatient.currentSickness.SicknessName;
+            else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
+                causeOfDeath = "medical failure (too many returns)";
+            
+            Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
+        }
+        
+        AddNewPatients();
+    }
+
+    private void CheckForReturningPatients()
+    {
         //If we can't receive any more patients, return
         if(_currentPatients.Count >= _maxPatientAmount)
             return;
@@ -131,46 +155,6 @@ public class PatientManager : ManagerBase
             var previousPatient = _patientsWithSideEffects.Dequeue();
             _currentPatients.Add(previousPatient);
             Debug.Log($"Patient [{previousPatient.patientInfo.PatientName}] returned");
-        }
-        
-        //Check for deaths
-        var deadPatients = CheckCurrentPatientsDeaths();
-
-        foreach (var deadPatient in deadPatients)
-        {
-            string causeOfDeath = null;
-
-            if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
-                causeOfDeath = deadPatient.currentSickness.SicknessName;
-            else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
-                causeOfDeath = "medical failure (too many returns)";
-            
-            Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
-        }
-        
-        //If we still have any space left, choose a random number of patients to add
-        if (_currentPatients.Count < _maxPatientAmount)
-        {
-            int patientsToAdd = Random.Range(1, _maxPatientAmount - _currentPatients.Count);
-
-            for (int i = 0; i < patientsToAdd; i++)
-            {
-                //Get only patients that are NOT currently in-game
-                var validPatients = _availablePatients
-                    .Where(template => _currentPatients.All(inGamePatient => template.PatientInfo != inGamePatient.patientInfo))
-                    .ToList();
-
-                if (validPatients.Count == 0)
-                {
-                    Debug.LogError($"There's not enough patients to choose from! Create more patients!");
-                    return;
-                }
-                
-                var newPatient = CreateNewPatient(
-                    validPatients[Random.Range(0, validPatients.Count)].PatientInfo,
-                    GetRandomSickness());
-                _currentPatients.Add(newPatient);
-            }
         }
     }
 
@@ -186,6 +170,34 @@ public class PatientManager : ManagerBase
         }
         
         return deadPatients;
+    }
+
+    private void AddNewPatients()
+    {
+        if (_currentPatients.Count >= _maxPatientAmount)
+            return;
+        
+        //If we still have any space left, choose a random number of patients to add
+        int patientsToAdd = Random.Range(1, _maxPatientAmount - _currentPatients.Count);
+
+        for (int i = 0; i < patientsToAdd; i++)
+        {
+            //Get only patients that are NOT currently in-game
+            var validPatients = _availablePatients
+                .Where(template => _currentPatients.All(inGamePatient => template.PatientInfo != inGamePatient.patientInfo))
+                .ToList();
+
+            if (validPatients.Count == 0)
+            {
+                Debug.LogError($"There's not enough patients to choose from! Create more patients!");
+                return;
+            }
+                
+            var newPatient = CreateNewPatient(
+                validPatients[Random.Range(0, validPatients.Count)].PatientInfo,
+                GetRandomSickness());
+            _currentPatients.Add(newPatient);
+        }
     }
     
     private bool DoesPotionCureSickness(CraftIngredient potion, Sickness sickness, out List<PropertySpec> leftoverEffects)

@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : SimpleSingleton<GameManager>
@@ -6,10 +7,13 @@ public class GameManager : SimpleSingleton<GameManager>
     [SerializeField] private PotionManager _potionManager;
     [SerializeField] private PatientManager _patientManager;
     [SerializeField] private FarmManager _farmManager;
+    [SerializeField] private TMP_Text _mistakesText;
+    [SerializeField] private int _maxMistakes;
     
     private Inventory _inventory = new();
     private ManagerBase _currentManager;
     private int _daysPlayed;
+    private int _mistakes;
 
     public Inventory Inventory => _inventory;
     public PotionManager PotionManager => _potionManager;
@@ -59,6 +63,17 @@ public class GameManager : SimpleSingleton<GameManager>
         HideCurrentManager();
         _farmManager.Show();
         _currentManager = _farmManager;
+    }
+
+    public void AddMistake()
+    {
+        _mistakes += 1;
+        _mistakesText.text = $"Mistakes: {_mistakes}";
+
+        if (_mistakes >= _maxMistakes)
+        {
+            Debug.Log("Game Over");
+        }
     }
 
     private void HideCurrentManager()
