@@ -9,11 +9,15 @@ public class GameManager : SimpleSingleton<GameManager>
     
     private Inventory _inventory = new();
     private ManagerBase _currentManager;
+    private int _daysPlayed;
 
     public Inventory Inventory => _inventory;
     public PotionManager PotionManager => _potionManager;
     public PatientManager PatientManager => _patientManager;
     public FarmManager FarmManager => _farmManager;
+    public int DaysPlayed => _daysPlayed;
+    
+    public event EventHandler onDaySkipped;
 
     private void Start()
     {
@@ -26,7 +30,14 @@ public class GameManager : SimpleSingleton<GameManager>
         _farmManager.Init();
         _farmManager.Hide();
         
-        ShowPatientScreen();
+        ShowPotionScreen();
+    }
+
+    public void SkipDay()
+    {
+        _daysPlayed++;
+        Debug.Log($"Starting Day {_daysPlayed}");
+        onDaySkipped?.Invoke(this, EventArgs.Empty);
     }
 
     public void ShowPotionScreen()

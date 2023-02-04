@@ -32,7 +32,7 @@ public class CraftIngredient
 
     public override string ToString()
     {
-        StringBuilder sb = new($"Ingredient Name: {_ingredientName}");
+        StringBuilder sb = new($"Item name: {_ingredientName}");
 
         foreach (var property in _properties)
         {

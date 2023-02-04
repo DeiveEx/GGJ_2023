@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 [Serializable]
@@ -21,5 +22,21 @@ public class Sickness
         _sicknessName = sicknessName;
         _daysToKill = daysToKill;
         _cureRequirements = cureRequirements.ToList();
+    }
+
+    public override string ToString()
+    {
+        StringBuilder sb = new();
+
+        sb.Append($"Sickness Name:\n{_sicknessName}\n");
+        sb.Append($"Days to kill: {_daysToKill}\n");
+        sb.Append($"Cure Requirements:\n");
+
+        foreach (var cureRequirement in _cureRequirements)
+        {
+            sb.Append($"- {cureRequirement.property.PropertyName}: {cureRequirement.amount}\n");
+        }
+
+        return sb.ToString();
     }
 }

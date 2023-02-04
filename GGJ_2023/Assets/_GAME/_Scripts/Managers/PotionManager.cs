@@ -18,10 +18,12 @@ public class PotionManager : ManagerBase
     [SerializeField] private Button _buttonPrefab;
     [SerializeField] private Transform _ingredientParent;
     [SerializeField] private Transform _potionParent;
-    [SerializeField] private TMP_Text _infoText;
+    [SerializeField] private TMP_Text _itemText;
+    [SerializeField] private TMP_Text _cauldronText;
     [SerializeField] private List<IngredientHolder> _initialIngredients = new();
 
     private List<Button> _buttons = new();
+    private CraftIngredient _selectedIngredient;
 
     private Inventory Inventory => GameManager.Instance.Inventory;
 
@@ -32,6 +34,15 @@ public class PotionManager : ManagerBase
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         _cauldron.onCauldronUpdated += (sender, args) => UpdateUI();
+    }
+
+    public void AddSelectedIngredient()
+    {
+        if(_selectedIngredient == null)
+            return;
+        
+        _cauldron.AddIngredient(_selectedIngredient);
+        Inventory.RemoveItem(_selectedIngredient);
     }
 
     protected override void OnShow()
@@ -75,7 +86,7 @@ public class PotionManager : ManagerBase
         
         _buttons.Clear();
         
-        //Instantiate new buttons
+        //Instantiate buttons
         foreach (var item in Inventory.CurrentItems)
         {
             var button = Instantiate(_buttonPrefab);
@@ -87,7 +98,7 @@ public class PotionManager : ManagerBase
                 
                 button.onClick.AddListener(() =>
                 {
-                    ShowPotionInfo(item.Key);
+                    _itemText.text = item.Key.ToString();
                 });
             }
             else
@@ -97,8 +108,8 @@ public class PotionManager : ManagerBase
                 
                 button.onClick.AddListener(() =>
                 {
-                    _cauldron.AddIngredient(item.Key);
-                    Inventory.RemoveItem(item.Key);
+                    _itemText.text = item.Key.ToString();
+                    _selectedIngredient = item.Key;
                 });
             }
 
@@ -106,11 +117,6 @@ public class PotionManager : ManagerBase
             _buttons.Add(button);
         }
         
-        ShowCauldronInfo();
-    }
-
-    private void ShowCauldronInfo()
-    {
         //Cauldron Info
         StringBuilder sb = new();
 
@@ -129,20 +135,6 @@ public class PotionManager : ManagerBase
             sb.Append($"- {property.Value.property.PropertyName}: {property.Value.amount}\n");
         }
         
-        _infoText.text = sb.ToString();
-    }
-
-    private void ShowPotionInfo(CraftIngredient potion)
-    {
-        StringBuilder sb = new();
-
-        sb.Append("Potion properties:\n");
-
-        foreach (var property in potion.Properties)
-        {
-            sb.Append($"- {property.property.PropertyName}: {property.amount}\n");
-        }
-        
-        _infoText.text = sb.ToString();
+        _cauldronText.text = sb.ToString();
     }
 }
