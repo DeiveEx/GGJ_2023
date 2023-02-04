@@ -3,38 +3,46 @@ using System.Collections.Generic;
 
 public class InventoryArgs : EventArgs
 {
-    public CraftIngredient item;
+    public InventoryItem itemEntry;
 }
 
 public class Inventory
 {
-    private Dictionary<CraftIngredient, int> _currentItems = new();
+    private Dictionary<object, InventoryItem> _currentItems = new();
 
-    public IReadOnlyDictionary<CraftIngredient, int> CurrentItems => _currentItems;
+    public IEnumerable<InventoryItem> CurrentItems => _currentItems.Values;
 
     public event EventHandler<InventoryArgs> onItemAdded;
     public event EventHandler<InventoryArgs> onItemRemoved;
 
-    public void AddItem(CraftIngredient item)
+    public void AddItem(object item)
     {
-        if(!_currentItems.ContainsKey(item))
-            _currentItems.Add(item, 0);
+        if (!_currentItems.ContainsKey(item))
+        {
+            _currentItems.Add(item, new InventoryItem()
+            {
+                Item = item,
+                Count = 0
+            });
+        }
 
-        _currentItems[item] += 1;
+        var entry = _currentItems[item];
+        entry.Count += 1;
         
-        onItemAdded?.Invoke(this, new InventoryArgs() { item = item});
+        onItemAdded?.Invoke(this, new InventoryArgs() { itemEntry = entry});
     }
 
-    public void RemoveItem(CraftIngredient item)
+    public void RemoveItem(object item)
     {
         if(!_currentItems.ContainsKey(item))
             return;
 
-        _currentItems[item] -= 1;
+        var entry = _currentItems[item];
+        entry.Count -= 1;
 
-        if (_currentItems[item] <= 0)
+        if (entry.Count <= 0)
             _currentItems.Remove(item);
         
-        onItemRemoved?.Invoke(this, new InventoryArgs() { item = item});
+        onItemRemoved?.Invoke(this, new InventoryArgs() { itemEntry = entry});
     }
 }

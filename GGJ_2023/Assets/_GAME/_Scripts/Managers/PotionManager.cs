@@ -87,29 +87,32 @@ public class PotionManager : ManagerBase
         _buttons.Clear();
         
         //Instantiate buttons
-        foreach (var item in Inventory.CurrentItems)
+        foreach (var inventoryItem in Inventory.CurrentItems)
         {
+            if(inventoryItem.Item is not CraftIngredient ingredient)
+                continue;
+            
             var button = Instantiate(_buttonPrefab);
-            string buttonTxt = $"{item.Key.IngredientName}";
+            string buttonTxt = $"{ingredient.IngredientName}";
 
-            if (item.Key.ItemType == ItemType.Potion)
+            if (ingredient.IngredientType == IngredientType.Potion)
             {
                 button.transform.SetParent(_potionParent, false);
                 
                 button.onClick.AddListener(() =>
                 {
-                    _itemText.text = item.Key.ToString();
+                    _itemText.text = ingredient.ToString();
                 });
             }
             else
             {
-                buttonTxt += $": {item.Value}";
+                buttonTxt += $": {inventoryItem.Count}";
                 button.transform.SetParent(_ingredientParent, false);
                 
                 button.onClick.AddListener(() =>
                 {
-                    _itemText.text = item.Key.ToString();
-                    _selectedIngredient = item.Key;
+                    _itemText.text = ingredient.ToString();
+                    _selectedIngredient = ingredient;
                 });
             }
 

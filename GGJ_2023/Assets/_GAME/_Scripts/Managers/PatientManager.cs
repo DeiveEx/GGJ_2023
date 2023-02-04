@@ -300,17 +300,18 @@ public class PatientManager : ManagerBase
         }
         
         //Potions
-        foreach (var item in Inventory.CurrentItems.Keys)
+        foreach (var inventoryItem in Inventory.CurrentItems)
         {
-            if(item.ItemType != ItemType.Potion)
+            if(inventoryItem.Item is not CraftIngredient ingredient ||
+               ingredient.IngredientType != IngredientType.Potion)
                 continue;
             
             var button = Instantiate(_buttonPrefab, _potionParent, false);
-            button.GetComponentInChildren<TMP_Text>().text = item.IngredientName;
+            button.GetComponentInChildren<TMP_Text>().text = ingredient.IngredientName;
             
             button.onClick.AddListener(() =>
             {
-                _selectedPotion = item;
+                _selectedPotion = ingredient;
                 UpdateUI();
             });
             
