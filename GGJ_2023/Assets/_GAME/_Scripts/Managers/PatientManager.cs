@@ -31,7 +31,8 @@ public class PatientManager : ManagerBase
     }
     
     [SerializeField] private List<PatientSO> _availablePatients = new();
-    [SerializeField] private List<SicknessSO> _availableSickness = new();
+    [SerializeField] private List<SicknessSO> _normalSicknesses = new();
+    [SerializeField] private List<SicknessSO> _medicalErrorSicknesses = new();
     [SerializeField] private int _maxPatientAmount = 3;
     [SerializeField] private int _maxReturnsBeforeDeath = 3;
     [SerializeField] private Button _buttonPrefab;
@@ -81,15 +82,14 @@ public class PatientManager : ManagerBase
         Inventory.RemoveItem(_selectedPotion);
         _currentPatients.Remove(_selectedPatient);
 
-        StringBuilder sb = new("Patient Cured!\n");
+        StringBuilder sb = new($"Patient [{_selectedPatient.patientInfo.PatientName}] Cured!\n");
 
         //If we have leftovers effects, find out which sickness he's gonna have and add this patient to the sideEffectList
         if (leftoverEffects != null)
         {
-            var sickness = GetSicknessFromProperties(leftoverEffects);
+            var sickness = GetRandomSickness(true);
             var patient = CreateNewPatient(_selectedPatient.patientInfo, sickness);
-
-            patient.clinicReturnCount += 1;
+            patient.clinicReturnCount = _selectedPatient.clinicReturnCount + 1;
         
             _patientsWithSideEffects.Enqueue(patient);
             
@@ -99,15 +99,12 @@ public class PatientManager : ManagerBase
             {
                 sb.Append($"- {leftoverEffect.property}: {leftoverEffect.amount}\n");
             }
+
+            sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
         }
         
         UpdateUI();
         Debug.Log(sb.ToString());
-    }
-
-    private void AddPatientWithSideEffect(PatientSpec patient)
-    {
-        _patientsWithSideEffects.Enqueue(patient);
     }
 
     private PatientSpec CreateNewPatient(Patient patientInfo, Sickness sickness)
@@ -133,6 +130,22 @@ public class PatientManager : ManagerBase
         {
             var previousPatient = _patientsWithSideEffects.Dequeue();
             _currentPatients.Add(previousPatient);
+            Debug.Log($"Patient [{previousPatient.patientInfo.PatientName}] returned");
+        }
+        
+        //Check for deaths
+        var deadPatients = CheckCurrentPatientsDeaths();
+
+        foreach (var deadPatient in deadPatients)
+        {
+            string causeOfDeath = null;
+
+            if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
+                causeOfDeath = deadPatient.currentSickness.SicknessName;
+            else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
+                causeOfDeath = "medical failure (too many returns)";
+            
+            Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
         }
         
         //If we still have any space left, choose a random number of patients to add
@@ -155,7 +168,7 @@ public class PatientManager : ManagerBase
                 
                 var newPatient = CreateNewPatient(
                     validPatients[Random.Range(0, validPatients.Count)].PatientInfo,
-                    _availableSickness[Random.Range(0, _availableSickness.Count)].SicknessInfo);
+                    GetRandomSickness());
                 _currentPatients.Add(newPatient);
             }
         }
@@ -164,7 +177,7 @@ public class PatientManager : ManagerBase
     private IEnumerable<PatientSpec> CheckCurrentPatientsDeaths()
     {
         var deadPatients = _currentPatients
-            .Where(x => x.daysSick >= x.currentSickness.DaysToKill || x.clinicReturnCount > _maxReturnsBeforeDeath)
+            .Where(x => x.daysSick >= x.currentSickness.DaysToKill || x.clinicReturnCount >= _maxReturnsBeforeDeath)
             .ToList();
 
         foreach (var deadPatient in deadPatients)
@@ -237,34 +250,16 @@ public class PatientManager : ManagerBase
             patient.daysSick += 1;
         }
         
-        var deadPatients = CheckCurrentPatientsDeaths();
-
-        foreach (var deadPatient in deadPatients)
-        {
-            string causeOfDeath = null;
-
-            if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
-                causeOfDeath = deadPatient.currentSickness.SicknessName;
-            else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
-                causeOfDeath = "medical failure (too many returns)";
-            
-            Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
-        }
-        
         UpdateCurrentPatientList();
-
         UpdateUI();
     }
 
-    private Sickness GetSicknessFromProperties(IEnumerable<PropertySpec> properties)
+    private Sickness GetRandomSickness(bool medicalError = false)
     {
-        foreach (var sicknessSo in _availableSickness)
-        {
-            
-        }
+        if (medicalError)
+            return _medicalErrorSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
         
-        Debug.LogError($"No sickness found with the given properties!");
-        return null;
+        return _normalSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
     }
 
     private void UpdateUI()
