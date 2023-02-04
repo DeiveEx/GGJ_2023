@@ -108,7 +108,7 @@ public class Cauldron_Tester : MonoBehaviour
         button.interactable = selectedIngredient.available > 0;
 
         var buttonText = button.GetComponentInChildren<TMP_Text>();
-        buttonText.text = $"{selectedIngredient.ingredient.IngredientInfo.IngredientName}: {selectedIngredient.available}";
+        buttonText.text = $"{selectedIngredient.ingredient.IngredientInfo.ItemName}: {selectedIngredient.available}";
     }
 
     private void UpdateInfo(string ingredientsMessage = null, string propertiesMessage = null, string sicknessMessage = null)
@@ -138,7 +138,7 @@ public class Cauldron_Tester : MonoBehaviour
 
             foreach (var ingredient in ingredients)
             {
-                sb.AppendLine($"- {ingredient.IngredientName}");
+                sb.AppendLine($"- {ingredient.ItemName}");
             }
         }
 

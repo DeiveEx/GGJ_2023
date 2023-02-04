@@ -8,14 +8,14 @@ public class InventoryArgs : EventArgs
 
 public class Inventory
 {
-    private Dictionary<object, InventoryItem> _currentItems = new();
+    private Dictionary<Item, InventoryItem> _currentItems = new();
 
     public IEnumerable<InventoryItem> CurrentItems => _currentItems.Values;
 
     public event EventHandler<InventoryArgs> onItemAdded;
     public event EventHandler<InventoryArgs> onItemRemoved;
 
-    public void AddItem(object item)
+    public void AddItem(Item item)
     {
         if (!_currentItems.ContainsKey(item))
         {
@@ -32,7 +32,7 @@ public class Inventory
         onItemAdded?.Invoke(this, new InventoryArgs() { itemEntry = entry});
     }
 
-    public void RemoveItem(object item)
+    public void RemoveItem(Item item)
     {
         if(!_currentItems.ContainsKey(item))
             return;

@@ -19,27 +19,24 @@ public class PropertySpec
 }
 
 [Serializable]
-public class CraftIngredient
+public class CraftIngredient : Item
 {
-    [SerializeField] private string _ingredientName;
     [SerializeField] private List<PropertySpec> _properties = new();
     
     private IngredientType _ingredientType;
 
-    public string IngredientName => _ingredientName;
     public IEnumerable<PropertySpec> Properties => _properties;
     public IngredientType IngredientType => _ingredientType;
 
-    public CraftIngredient(string propertyName, IEnumerable<PropertySpec> properties, IngredientType ingredientType)
+    public CraftIngredient(string ingredientName, IEnumerable<PropertySpec> properties, IngredientType ingredientType): base(ingredientName)
     {
-        _ingredientName = propertyName;
         _properties = properties.ToList();
         _ingredientType = ingredientType;
     }
 
     public override string ToString()
     {
-        StringBuilder sb = new($"Item name: {_ingredientName}");
+        StringBuilder sb = new($"Item name: {_itemName}");
 
         foreach (var property in _properties)
         {

@@ -307,7 +307,7 @@ public class PatientManager : ManagerBase
                 continue;
             
             var button = Instantiate(_buttonPrefab, _potionParent, false);
-            button.GetComponentInChildren<TMP_Text>().text = ingredient.IngredientName;
+            button.GetComponentInChildren<TMP_Text>().text = ingredient.ItemName;
             
             button.onClick.AddListener(() =>
             {

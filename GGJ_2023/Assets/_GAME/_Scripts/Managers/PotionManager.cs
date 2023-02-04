@@ -93,7 +93,7 @@ public class PotionManager : ManagerBase
                 continue;
             
             var button = Instantiate(_buttonPrefab);
-            string buttonTxt = $"{ingredient.IngredientName}";
+            string buttonTxt = $"{ingredient.ItemName}";
 
             if (ingredient.IngredientType == IngredientType.Potion)
             {
@@ -127,7 +127,7 @@ public class PotionManager : ManagerBase
 
         foreach (var ingredient in _cauldron.CurrentIngredients)
         {
-            sb.Append($"- {ingredient.IngredientName}\n");
+            sb.Append($"- {ingredient.ItemName}\n");
         }
 
         sb.Append("\n");
