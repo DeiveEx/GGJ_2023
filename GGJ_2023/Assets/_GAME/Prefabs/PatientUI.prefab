@@ -2598,3 +2598,11 @@ MonoBehaviour:
   _potionParent: {fileID: 4933121910759127368}
   _patientInfo: {fileID: 4933121910282217540}
   _potionInfo: {fileID: 4933121910842142852}
+  _patientMusic: {fileID: 11400000, guid: 2de52bed0f062e846b6394d9b0c6b5d8, type: 2}
+  _patientAmbient: {fileID: 11400000, guid: c166232e7be62274d98aea40e00c80ed, type: 2}
+  _patientFullyHealed: {fileID: 11400000, guid: cc0023ab623a8e84a85c697b145205bd,
+    type: 2}
+  _patientPartlyHealed: {fileID: 11400000, guid: c65ca96831ea0a849be69bc5a0f5ce85,
+    type: 2}
+  _coughFemale: {fileID: 11400000, guid: 9a27afdc923a1f34e9da411cbcbcc027, type: 2}
+  _coughMale: {fileID: 11400000, guid: 97329f9e5e922e14fa10d47186dc9406, type: 2}
