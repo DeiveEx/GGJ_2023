@@ -51,9 +51,6 @@ public class PatientManager : ManagerBase
 
     public override void Init()
     {
-        UpdateCurrentPatientList();
-        UpdateUI();
-        
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         GameManager.Instance.onDaySkipped += (sender, args) => OnDaySkipped();
@@ -102,6 +99,9 @@ public class PatientManager : ManagerBase
 
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
         }
+
+        _selectedPatient = null;
+        _selectedPotion = null;
         
         UpdateUI();
         Debug.Log(sb.ToString());
@@ -300,17 +300,18 @@ public class PatientManager : ManagerBase
         }
         
         //Potions
-        foreach (var item in Inventory.CurrentItems.Keys)
+        foreach (var inventoryItem in Inventory.CurrentItems)
         {
-            if(item.ItemType != ItemType.Potion)
+            if(inventoryItem.Item is not CraftIngredient ingredient ||
+               ingredient.IngredientType != IngredientType.Potion)
                 continue;
             
             var button = Instantiate(_buttonPrefab, _potionParent, false);
-            button.GetComponentInChildren<TMP_Text>().text = item.IngredientName;
+            button.GetComponentInChildren<TMP_Text>().text = ingredient.ItemName;
             
             button.onClick.AddListener(() =>
             {
-                _selectedPotion = item;
+                _selectedPotion = ingredient;
                 UpdateUI();
             });
             

@@ -71,7 +71,7 @@ public class CauldronCraftStation : MonoBehaviour
                 property = x.Key,
                 amount = x.Value.amount
             }),
-            ItemType.Potion
+            IngredientType.Potion
         );
 
         _currentIngredients.Clear();

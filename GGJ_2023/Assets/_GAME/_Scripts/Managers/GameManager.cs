@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ public class GameManager : SimpleSingleton<GameManager>
     [SerializeField] private FarmManager _farmManager;
     [SerializeField] private TMP_Text _mistakesText;
     [SerializeField] private int _maxMistakes;
+    [SerializeField] private List<PotionManager.IngredientHolder> _initialIngredients = new();
+    [SerializeField] private List<PlantSO> _initialSeeds = new();
+
     
     private Inventory _inventory = new();
     private ManagerBase _currentManager;
@@ -25,6 +29,8 @@ public class GameManager : SimpleSingleton<GameManager>
 
     private void Start()
     {
+        AddInitialItems();
+        
         _potionManager.Init();
         _potionManager.Hide();
         
@@ -35,6 +41,7 @@ public class GameManager : SimpleSingleton<GameManager>
         _farmManager.Hide();
         
         ShowPotionScreen();
+        SkipDay();
     }
 
     public void SkipDay()
@@ -80,5 +87,20 @@ public class GameManager : SimpleSingleton<GameManager>
     {
         if(_currentManager != null)
             _currentManager.Hide();
+    }
+
+    private void AddInitialItems()
+    {
+        //Ingredients
+        foreach (var initialIngredient in _initialIngredients)
+        {
+            Inventory.AddItem(initialIngredient.ingredient.IngredientInfo);
+        }
+        
+        //Seeds
+        foreach (var initialSeed in _initialSeeds)
+        {
+            Inventory.AddItem(initialSeed.PlantInfo);
+        }
     }
 }
