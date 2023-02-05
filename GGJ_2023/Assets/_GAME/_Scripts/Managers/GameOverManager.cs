@@ -33,7 +33,17 @@ public class GameOverManager : MonoBehaviour
         List<string> _statistics = new()
         {
             $"Days played: {GameData.daysPlayed}",
-            $"Patients cured: {GameData.patientsCured}"
+            $"Patients cured: {GameData.patientsCured}",
+            $"Patients fully cured: {GameData.patientsFullyCured}",
+            $"Patients returns: {GameData.patientReturns}",
+            $"Patients dead: {GameData.patientsDead}",
+            $"Patients dead from Sickness: {GameData.patientsDeadForSickness}",
+            $"Patients dead from Medical Failure: {GameData.patientsDeadForMedicalFailure}",
+            $"Potions created: {GameData.potionsCreated}",
+            $"Ingredients used: {GameData.ingredientsUsed}",
+            $"Seeds planted: {GameData.seedsPlanted}",
+            $"Plants harvested: {GameData.plantsHarvested}",
+            $"Plants dead: {GameData.plantsDead}",
         };
         
         foreach (var statistic in _statistics)

@@ -7,22 +7,13 @@ public class FarmPlot : MonoBehaviour
     private int _daysPlanted;
     private bool _isWatered;
     private int _daysWithoutWater;
+    private PlantStage _currentStage;
 
     public Plant PlantInfo => _plantInfo;
     public int DaysPlanted => _daysPlanted;
     public bool IsWatered => _isWatered;
     public int DaysWithoutWater => _daysWithoutWater;
-    public PlantStage CurrentStage
-    {
-        get
-        {
-            //If we haven't got any water, the plant is dead
-            if(_daysWithoutWater > _plantInfo.MaxDaysWithoutWater)
-                return _plantInfo.GetStageFromDays(int.MaxValue).stage;
-            
-            return _plantInfo.GetStageFromDays(_daysPlanted).stage;
-        }
-    }
+    public PlantStage CurrentStage => _currentStage;
 
     public void AssignPlant(Plant plant)
     {
@@ -69,6 +60,12 @@ public class FarmPlot : MonoBehaviour
         
         _isWatered = false;
         _daysPlanted += 1;
+        
+        //If we haven't got any water, the plant is dead
+        if (_daysWithoutWater > _plantInfo.MaxDaysWithoutWater)
+            _currentStage = PlantStage.Dead;
+        else
+            _currentStage = _plantInfo.GetStageFromDays(_daysPlanted).stage;
     }
 
     public override string ToString()

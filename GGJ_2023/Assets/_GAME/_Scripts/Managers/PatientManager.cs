@@ -99,6 +99,12 @@ public class PatientManager : GameplayManagerBase
             }
 
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
+
+            GameData.patientReturns += 1;
+        }
+        else
+        {
+            GameData.patientsFullyCured += 1;
         }
 
         _selectedPatient = null;
@@ -135,11 +141,19 @@ public class PatientManager : GameplayManagerBase
             string causeOfDeath = null;
 
             if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
+            {
                 causeOfDeath = deadPatient.currentSickness.SicknessName;
+                GameData.patientsDeadForSickness += 1;
+            }
             else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
+            {
                 causeOfDeath = "medical failure (too many returns)";
+                GameData.patientsDeadForMedicalFailure += 1;
+            }
             
             Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
+
+            GameData.patientsDead += 1;
         }
         
         AddNewPatients();

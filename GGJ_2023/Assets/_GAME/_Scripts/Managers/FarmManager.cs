@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +16,7 @@ public class FarmManager : GameplayManagerBase
     private Plant _selectedSeed;
 
     private Inventory Inventory => GameManager.Instance.Inventory;
+    private GameData GameData => GlobalManager.Instance.GameData;
 
     public override void Init()
     {
@@ -45,8 +45,11 @@ public class FarmManager : GameplayManagerBase
     {
         if (plot.PlantInfo == null)
         {
-            if(PlantSeed(_selectedSeed, plot))
+            if (PlantSeed(_selectedSeed, plot))
+            {
                 _selectedSeed = null;
+                GameData.seedsPlanted += 1;
+            }
             
             return;
         }
@@ -55,9 +58,16 @@ public class FarmManager : GameplayManagerBase
             plot.CurrentStage == PlantStage.Dead)
         {
             var reward = plot.HarvestPlot();
-            
-            if(reward != null)
+
+            if (reward != null)
+            {
                 Inventory.AddItem(reward);
+                GameData.plantsHarvested += 1;
+            }
+            else
+            {
+                GameData.plantsDead += 1;
+            }
             
             return;
         }
