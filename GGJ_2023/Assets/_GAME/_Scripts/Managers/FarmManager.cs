@@ -85,8 +85,7 @@ public class FarmManager : ManagerBase
     {
         foreach (var plot in _farmPlots)
         {
-            if(plot.IsWatered)
-                plot.SkipDay();
+            plot.SkipDay();
         }
         
         UpdateUI();
@@ -133,7 +132,9 @@ public class FarmManager : ManagerBase
                 sb.Append($"{plot.PlantInfo.ItemName}\n");
                 sb.Append($"Days planted: {plot.DaysPlanted}\n");
                 sb.Append($"Is Watered: {plot.IsWatered}\n");
-                sb.Append($"Stage: {plot.PlantInfo.GetStageFromDays(plot.DaysPlanted).stage}\n");
+                sb.Append($"Days w/out water: {plot.DaysWithoutWater}\n");
+                sb.Append($"Max days w/out water: {plot.PlantInfo.MaxDaysWithoutWater}\n");
+                sb.Append($"Stage: {plot.CurrentStage}\n");
             }
             
             plot.GetComponentInChildren<TMP_Text>().text = sb.ToString();

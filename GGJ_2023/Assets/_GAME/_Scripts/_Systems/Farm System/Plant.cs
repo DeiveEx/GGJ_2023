@@ -22,11 +22,13 @@ public class Plant : Item
         public int duration;
     }
 
+    [SerializeField] private int _maxDaysWithoutWater;
     [SerializeField] private List<PlantStageInfo> _stages = new();
     [SerializeField] private CraftIngredientSO _harvestReward;
 
     public List<PlantStageInfo> Stages => _stages;
     public CraftIngredientSO HarvestReward => _harvestReward;
+    public int MaxDaysWithoutWater => _maxDaysWithoutWater;
 
     public Plant(string plantName) : base(plantName) { }
 

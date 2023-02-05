@@ -51,9 +51,6 @@ public class PatientManager : ManagerBase
 
     public override void Init()
     {
-        UpdateCurrentPatientList();
-        UpdateUI();
-        
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         GameManager.Instance.onDaySkipped += (sender, args) => OnDaySkipped();

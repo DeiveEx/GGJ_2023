@@ -41,6 +41,7 @@ public class GameManager : SimpleSingleton<GameManager>
         _farmManager.Hide();
         
         ShowPotionScreen();
+        SkipDay();
     }
 
     public void SkipDay()
