@@ -40,8 +40,6 @@ public class PotionManager : ManagerBase
         
         _cauldron.AddIngredient(_selectedIngredient);
         Inventory.RemoveItem(_selectedIngredient);
-
-        _selectedIngredient = null;
     }
 
     protected override void OnShow()
