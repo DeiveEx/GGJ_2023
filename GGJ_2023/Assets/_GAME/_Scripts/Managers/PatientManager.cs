@@ -23,7 +23,7 @@ public class PatientManager : GameplayManagerBase
 
             sb.Append($"Patient name:\n{patientInfo.PatientName}\n");
             sb.Append($"Days sick: {daysSick + 1}\n");
-            sb.Append($"Return count: {clinicReturnCount + 1}\n");
+            sb.Append($"Return count: {clinicReturnCount}\n");
             sb.Append($"{currentSickness}\n");
             
             return sb.ToString();
@@ -202,7 +202,9 @@ public class PatientManager : GameplayManagerBase
     private IEnumerable<PatientSpec> CheckCurrentPatientsDeaths()
     {
         var deadPatients = _currentPatients
-            .Where(x => x.daysSick >= x.currentSickness.DaysToKill || x.clinicReturnCount >= _maxReturnsBeforeDeath)
+            .Where(x => 
+                x.daysSick >= x.currentSickness.DaysToKill || 
+                x.clinicReturnCount > _maxReturnsBeforeDeath)
             .ToList();
 
         foreach (var deadPatient in deadPatients)
