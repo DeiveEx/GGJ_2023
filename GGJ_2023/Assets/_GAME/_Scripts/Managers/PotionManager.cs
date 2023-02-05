@@ -20,6 +20,7 @@ public class PotionManager : GameplayManagerBase
     [SerializeField] private Transform _potionParent;
     [SerializeField] private TMP_Text _itemText;
     [SerializeField] private TMP_Text _cauldronText;
+    [SerializeField] private IngredientTable _table;
     
     [Header("Sounds")]
     [SerializeField] private SoundCue _music;
@@ -29,6 +30,7 @@ public class PotionManager : GameplayManagerBase
     private List<Button> _buttons = new();
     private CraftIngredient _selectedIngredient;
 
+    public IngredientTable IngredientTable => _table;
     private Inventory Inventory => GameManager.Instance.Inventory;
     private GameData GameData => GlobalManager.Instance.GameData;
     private SoundManager SoundManager => GlobalManager.Instance.SoundManager;
@@ -39,6 +41,11 @@ public class PotionManager : GameplayManagerBase
         Inventory.onItemAdded += (sender, args) => UpdateUI();
         Inventory.onItemRemoved += (sender, args) => UpdateUI();
         _cauldron.onCauldronUpdated += (sender, args) => UpdateUI();
+    }
+
+    public void SetSelectedIngredient(CraftIngredient ingredient)
+    {
+        _selectedIngredient = ingredient;
     }
 
     public void AddSelectedIngredient()
@@ -85,6 +92,8 @@ public class PotionManager : GameplayManagerBase
 
     private void UpdateUI()
     {
+        _table.UpdateObjects();
+        
         //Clear previous buttons
         foreach (var button in _buttons)
         {
@@ -119,7 +128,7 @@ public class PotionManager : GameplayManagerBase
                 button.onClick.AddListener(() =>
                 {
                     _itemText.text = ingredient.ToString();
-                    _selectedIngredient = ingredient;
+                    SetSelectedIngredient(ingredient);
                 });
             }
 

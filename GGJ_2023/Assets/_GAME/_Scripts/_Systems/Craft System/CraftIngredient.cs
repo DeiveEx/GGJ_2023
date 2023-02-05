@@ -21,12 +21,14 @@ public class PropertySpec
 [Serializable]
 public class CraftIngredient : Item
 {
+    [SerializeField] private Sprite _sprite;
     [SerializeField] private List<PropertySpec> _properties = new();
     
     private IngredientType _ingredientType;
 
     public IEnumerable<PropertySpec> Properties => _properties;
     public IngredientType IngredientType => _ingredientType;
+    public Sprite Sprite => _sprite;
 
     public CraftIngredient(string ingredientName, IEnumerable<PropertySpec> properties, IngredientType ingredientType): base(ingredientName)
     {
