@@ -21,6 +21,7 @@ public class FarmPlot : MonoBehaviour
         _daysPlanted = 0;
         _daysWithoutWater = 0;
         _isWatered = false;
+        _currentStage = _plantInfo.GetStageFromDays(0).stage;
     }
 
     public void WaterPlot()
