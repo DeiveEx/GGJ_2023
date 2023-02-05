@@ -79,4 +79,13 @@ public class CauldronCraftStation : MonoBehaviour
         
         return potion;
     }
+
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if(!col.TryGetComponent<IngredientObject>(out var obj))
+            return;
+        
+        GameManager.Instance.PotionManager.AddSelectedIngredient();
+        Destroy(obj.gameObject);
+    }
 }
