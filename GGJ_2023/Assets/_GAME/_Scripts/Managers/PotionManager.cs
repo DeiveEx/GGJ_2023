@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PotionManager : ManagerBase
+public class PotionManager : GameplayManagerBase
 {
     [Serializable]
     public class IngredientHolder

@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class PatientManager : ManagerBase
+public class PatientManager : GameplayManagerBase
 {
     [Serializable]
     public class PatientSpec
@@ -22,8 +22,8 @@ public class PatientManager : ManagerBase
             StringBuilder sb = new();
 
             sb.Append($"Patient name:\n{patientInfo.PatientName}\n");
-            sb.Append($"Days sick: {daysSick}\n");
-            sb.Append($"Return count: {clinicReturnCount}\n");
+            sb.Append($"Days sick: {daysSick + 1}\n");
+            sb.Append($"Return count: {clinicReturnCount + 1}\n");
             sb.Append($"{currentSickness}\n");
             
             return sb.ToString();
@@ -48,6 +48,7 @@ public class PatientManager : ManagerBase
     private List<Button> _buttons = new();
     
     private Inventory Inventory => GameManager.Instance.Inventory;
+    private GameData GameData => GlobalManager.Instance.GameData;
 
     public override void Init()
     {
@@ -102,6 +103,8 @@ public class PatientManager : ManagerBase
 
         _selectedPatient = null;
         _selectedPotion = null;
+
+        GameData.patientsCured += 1;
         
         UpdateUI();
         Debug.Log(sb.ToString());
@@ -271,7 +274,7 @@ public class PatientManager : ManagerBase
         if (medicalError)
             return _medicalErrorSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
         
-        return _normalSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
+        return _normalSicknesses[Random.Range(0, _normalSicknesses.Count)].SicknessInfo;
     }
 
     private void UpdateUI()

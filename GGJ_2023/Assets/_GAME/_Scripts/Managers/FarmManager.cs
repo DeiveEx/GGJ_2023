@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FarmManager : ManagerBase
+public class FarmManager : GameplayManagerBase
 {   
     [SerializeField] private Button _buttonPrefab;
     [SerializeField] private Transform _seedParent;
@@ -119,26 +119,9 @@ public class FarmManager : ManagerBase
         }
         
         //Farm Plots
-        StringBuilder sb = new();
-        
         foreach (var plot in _farmPlots)
         {
-            if (plot.PlantInfo == null)
-            {
-                sb.Append("No plant");
-            }
-            else
-            {
-                sb.Append($"{plot.PlantInfo.ItemName}\n");
-                sb.Append($"Days planted: {plot.DaysPlanted}\n");
-                sb.Append($"Is Watered: {plot.IsWatered}\n");
-                sb.Append($"Days w/out water: {plot.DaysWithoutWater}\n");
-                sb.Append($"Max days w/out water: {plot.PlantInfo.MaxDaysWithoutWater}\n");
-                sb.Append($"Stage: {plot.CurrentStage}\n");
-            }
-            
-            plot.GetComponentInChildren<TMP_Text>().text = sb.ToString();
-            sb.Clear();
+            plot.GetComponentInChildren<TMP_Text>().text = plot.ToString();
         }
     }
 }

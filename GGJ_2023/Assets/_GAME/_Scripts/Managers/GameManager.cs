@@ -15,15 +15,13 @@ public class GameManager : SimpleSingleton<GameManager>
 
     
     private Inventory _inventory = new();
-    private ManagerBase _currentManager;
-    private int _daysPlayed;
+    private GameplayManagerBase _currentManager;
     private int _mistakes;
 
     public Inventory Inventory => _inventory;
     public PotionManager PotionManager => _potionManager;
     public PatientManager PatientManager => _patientManager;
     public FarmManager FarmManager => _farmManager;
-    public int DaysPlayed => _daysPlayed;
     
     public event EventHandler onDaySkipped;
 
@@ -46,8 +44,8 @@ public class GameManager : SimpleSingleton<GameManager>
 
     public void SkipDay()
     {
-        _daysPlayed++;
-        Debug.Log($"Starting Day {_daysPlayed}");
+        GlobalManager.Instance.GameData.daysPlayed++;
+        Debug.Log($"Starting Day {GlobalManager.Instance.GameData.daysPlayed}");
         onDaySkipped?.Invoke(this, EventArgs.Empty);
     }
 
@@ -80,6 +78,9 @@ public class GameManager : SimpleSingleton<GameManager>
         if (_mistakes >= _maxMistakes)
         {
             Debug.Log("Game Over");
+            
+            if(GlobalManager.Instance.AllowGameOver)
+                GlobalManager.Instance.ShowGameOverScreen();
         }
     }
 
@@ -94,7 +95,10 @@ public class GameManager : SimpleSingleton<GameManager>
         //Ingredients
         foreach (var initialIngredient in _initialIngredients)
         {
-            Inventory.AddItem(initialIngredient.ingredient.IngredientInfo);
+            for (int i = 0; i < initialIngredient.available; i++)
+            {
+                Inventory.AddItem(initialIngredient.ingredient.IngredientInfo);
+            }
         }
         
         //Seeds

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public abstract class SimpleSingleton<T> : MonoBehaviour where T : Object
 {
@@ -13,5 +14,11 @@ public abstract class SimpleSingleton<T> : MonoBehaviour where T : Object
 
             return _instance;
         }
+    }
+
+    private void Awake()
+    {
+        if(_instance != null)
+            Destroy(this.gameObject);
     }
 }
