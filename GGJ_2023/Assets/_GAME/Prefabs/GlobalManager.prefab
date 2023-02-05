@@ -48,6 +48,7 @@ MonoBehaviour:
   _titleScreen: TitleScreen
   _gameplayScreen: Main
   _gameOverScreen: GameOver
+  _allowGameOver: 1
 --- !u!114 &2208710935029201575
 MonoBehaviour:
   m_ObjectHideFlags: 0

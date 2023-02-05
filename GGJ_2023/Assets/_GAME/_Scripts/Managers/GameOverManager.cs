@@ -28,13 +28,14 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator ShowStatistics()
     {
         var delay = new WaitForSeconds(_statisticsDelayPerLine);
-        _statisticsText.text += "";
+        _statisticsText.text = "";
 
-        List<string> _statistics = new();
+        List<string> _statistics = new()
+        {
+            $"Days played: {GameData.daysPlayed}",
+            $"Patients cured: {GameData.patientsCured}"
+        };
         
-        _statistics.Add($"Days played: {GameData.daysPlayed}");
-        _statistics.Add($"Patients cured: {GameData.patientsCured}");
-
         foreach (var statistic in _statistics)
         {
             yield return delay;
