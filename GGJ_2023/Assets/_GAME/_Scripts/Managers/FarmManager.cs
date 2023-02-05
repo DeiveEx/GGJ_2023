@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FarmManager : ManagerBase
+public class FarmManager : GameplayManagerBase
 {   
     [SerializeField] private Button _buttonPrefab;
     [SerializeField] private Transform _seedParent;
@@ -17,6 +16,7 @@ public class FarmManager : ManagerBase
     private Plant _selectedSeed;
 
     private Inventory Inventory => GameManager.Instance.Inventory;
+    private GameData GameData => GlobalManager.Instance.GameData;
 
     public override void Init()
     {
@@ -45,8 +45,11 @@ public class FarmManager : ManagerBase
     {
         if (plot.PlantInfo == null)
         {
-            if(PlantSeed(_selectedSeed, plot))
+            if (PlantSeed(_selectedSeed, plot))
+            {
                 _selectedSeed = null;
+                GameData.seedsPlanted += 1;
+            }
             
             return;
         }
@@ -55,9 +58,16 @@ public class FarmManager : ManagerBase
             plot.CurrentStage == PlantStage.Dead)
         {
             var reward = plot.HarvestPlot();
-            
-            if(reward != null)
+
+            if (reward != null)
+            {
                 Inventory.AddItem(reward);
+                GameData.plantsHarvested += 1;
+            }
+            else
+            {
+                GameData.plantsDead += 1;
+            }
             
             return;
         }
@@ -119,26 +129,9 @@ public class FarmManager : ManagerBase
         }
         
         //Farm Plots
-        StringBuilder sb = new();
-        
         foreach (var plot in _farmPlots)
         {
-            if (plot.PlantInfo == null)
-            {
-                sb.Append("No plant");
-            }
-            else
-            {
-                sb.Append($"{plot.PlantInfo.ItemName}\n");
-                sb.Append($"Days planted: {plot.DaysPlanted}\n");
-                sb.Append($"Is Watered: {plot.IsWatered}\n");
-                sb.Append($"Days w/out water: {plot.DaysWithoutWater}\n");
-                sb.Append($"Max days w/out water: {plot.PlantInfo.MaxDaysWithoutWater}\n");
-                sb.Append($"Stage: {plot.CurrentStage}\n");
-            }
-            
-            plot.GetComponentInChildren<TMP_Text>().text = sb.ToString();
-            sb.Clear();
+            plot.GetComponentInChildren<TMP_Text>().text = plot.ToString();
         }
     }
 }

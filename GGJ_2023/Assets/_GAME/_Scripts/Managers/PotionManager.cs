@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PotionManager : ManagerBase
+public class PotionManager : GameplayManagerBase
 {
     [Serializable]
     public class IngredientHolder
@@ -25,6 +25,7 @@ public class PotionManager : ManagerBase
     private CraftIngredient _selectedIngredient;
 
     private Inventory Inventory => GameManager.Instance.Inventory;
+    private GameData GameData => GlobalManager.Instance.GameData;
 
     public override void Init()
     {
@@ -40,6 +41,7 @@ public class PotionManager : ManagerBase
         
         _cauldron.AddIngredient(_selectedIngredient);
         Inventory.RemoveItem(_selectedIngredient);
+        GameData.ingredientsUsed += 1;
     }
 
     protected override void OnShow()
@@ -58,6 +60,7 @@ public class PotionManager : ManagerBase
         }
         
         Inventory.AddItem(potion);
+        GameData.potionsCreated += 1;
         
         UpdateUI();
     }

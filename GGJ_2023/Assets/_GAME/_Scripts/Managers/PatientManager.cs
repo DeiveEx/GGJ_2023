@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
-public class PatientManager : ManagerBase
+public class PatientManager : GameplayManagerBase
 {
     [Serializable]
     public class PatientSpec
@@ -22,8 +22,8 @@ public class PatientManager : ManagerBase
             StringBuilder sb = new();
 
             sb.Append($"Patient name:\n{patientInfo.PatientName}\n");
-            sb.Append($"Days sick: {daysSick}\n");
-            sb.Append($"Return count: {clinicReturnCount}\n");
+            sb.Append($"Days sick: {daysSick + 1}\n");
+            sb.Append($"Return count: {clinicReturnCount + 1}\n");
             sb.Append($"{currentSickness}\n");
             
             return sb.ToString();
@@ -48,6 +48,7 @@ public class PatientManager : ManagerBase
     private List<Button> _buttons = new();
     
     private Inventory Inventory => GameManager.Instance.Inventory;
+    private GameData GameData => GlobalManager.Instance.GameData;
 
     public override void Init()
     {
@@ -98,10 +99,18 @@ public class PatientManager : ManagerBase
             }
 
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
+
+            GameData.patientReturns += 1;
+        }
+        else
+        {
+            GameData.patientsFullyCured += 1;
         }
 
         _selectedPatient = null;
         _selectedPotion = null;
+
+        GameData.patientsCured += 1;
         
         UpdateUI();
         Debug.Log(sb.ToString());
@@ -132,11 +141,19 @@ public class PatientManager : ManagerBase
             string causeOfDeath = null;
 
             if (deadPatient.daysSick >= deadPatient.currentSickness.DaysToKill)
+            {
                 causeOfDeath = deadPatient.currentSickness.SicknessName;
+                GameData.patientsDeadForSickness += 1;
+            }
             else if (deadPatient.clinicReturnCount >= _maxReturnsBeforeDeath)
+            {
                 causeOfDeath = "medical failure (too many returns)";
+                GameData.patientsDeadForMedicalFailure += 1;
+            }
             
             Debug.Log($"Patient [{deadPatient.patientInfo.PatientName}] died because of [{causeOfDeath}]");
+
+            GameData.patientsDead += 1;
         }
         
         AddNewPatients();
@@ -271,7 +288,7 @@ public class PatientManager : ManagerBase
         if (medicalError)
             return _medicalErrorSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
         
-        return _normalSicknesses[Random.Range(0, _medicalErrorSicknesses.Count)].SicknessInfo;
+        return _normalSicknesses[Random.Range(0, _normalSicknesses.Count)].SicknessInfo;
     }
 
     private void UpdateUI()

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class ManagerBase : MonoBehaviour
+public abstract class GameplayManagerBase : MonoBehaviour
 {
     [SerializeField] protected GameObject _panel;
 

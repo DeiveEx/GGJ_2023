@@ -42,7 +42,7 @@ public class Plant : Item
         {
             totalDays += stage.duration;
 
-            if (days <= totalDays)
+            if (days < totalDays)
                 return stage;
         }
 
