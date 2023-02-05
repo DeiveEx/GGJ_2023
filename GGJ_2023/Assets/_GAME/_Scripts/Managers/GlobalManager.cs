@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GlobalManager : SimpleSingleton<GlobalManager>
 {
+    [SerializeField] private SoundManager _soundManager;
     [SerializeField] private string _titleScreen;
     [SerializeField] private string _gameplayScreen;
     [SerializeField] private string _gameOverScreen;
@@ -10,6 +11,7 @@ public class GlobalManager : SimpleSingleton<GlobalManager>
 
     private GameData _gameData = new();
 
+    public SoundManager SoundManager => _soundManager;
     public GameData GameData => _gameData;
     public bool AllowGameOver => _allowGameOver;
 

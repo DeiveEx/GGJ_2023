@@ -660,6 +660,9 @@ MonoBehaviour:
   _potionParent: {fileID: 2757556698145365068}
   _itemText: {fileID: 2757556696651020495}
   _cauldronText: {fileID: 2757556697561640219}
+  _music: {fileID: 11400000, guid: eb52687ac66fb654e8855c54dac21314, type: 2}
+  _ambient: {fileID: 11400000, guid: 8396d6ca24972b442bfffb35d5e0d032, type: 2}
+  _addIngredient: {fileID: 11400000, guid: 1b2b01c8c2b3c82439ed81f0960847e6, type: 2}
 --- !u!1 &2757556696848471623
 GameObject:
   m_ObjectHideFlags: 0

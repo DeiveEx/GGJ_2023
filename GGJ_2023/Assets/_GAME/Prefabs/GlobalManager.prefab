@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2208710935029201573}
   - component: {fileID: 2208710935029201572}
   - component: {fileID: 2208710935029201575}
+  - component: {fileID: 1385388286956315339}
   m_Layer: 0
   m_Name: GlobalManager
   m_TagString: Untagged
@@ -45,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ab6f1bf74d44374ebfb5414ea92b119, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _soundManager: {fileID: 1385388286956315339}
   _titleScreen: TitleScreen
   _gameplayScreen: Main
   _gameOverScreen: GameOver
@@ -61,3 +63,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5de97db4d6b52e4d9cc84ff9f020ce9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1385388286956315339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2208710935029201574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46d65ebd96a8c10488259a0fa24efb75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mixer: {fileID: 24100000, guid: ee16dff1f5a8bfe42a366a0be661f61c, type: 2}
+  _musicGroup: {fileID: 5468853084964152507, guid: ee16dff1f5a8bfe42a366a0be661f61c,
+    type: 2}
+  _ambientGroup: {fileID: -7827361122795165624, guid: ee16dff1f5a8bfe42a366a0be661f61c,
+    type: 2}
+  _soundEffectsGroup: {fileID: -8136891577413365030, guid: ee16dff1f5a8bfe42a366a0be661f61c,
+    type: 2}
+  _sourcePrefab: {fileID: 5903547458936817503, guid: 8830ea7b8217fc24d9f6f05ee1836878,
+    type: 3}
+  _minMaxEffectPitch: {x: 0.9, y: 1.1}
+  _minMaxEffectVolume: {x: 0.9, y: 1}

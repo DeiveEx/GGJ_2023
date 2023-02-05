@@ -23,7 +23,7 @@ public class PatientManager : GameplayManagerBase
 
             sb.Append($"Patient name:\n{patientInfo.PatientName}\n");
             sb.Append($"Days sick: {daysSick + 1}\n");
-            sb.Append($"Return count: {clinicReturnCount + 1}\n");
+            sb.Append($"Return count: {clinicReturnCount}\n");
             sb.Append($"{currentSickness}\n");
             
             return sb.ToString();
@@ -41,6 +41,14 @@ public class PatientManager : GameplayManagerBase
     [SerializeField] private TMP_Text _patientInfo;
     [SerializeField] private TMP_Text _potionInfo;
     
+    [Header("Sounds")]
+    [SerializeField] private SoundCue _patientMusic;
+    [SerializeField] private SoundCue _patientAmbient;
+    [SerializeField] private SoundCue _patientFullyHealed;
+    [SerializeField] private SoundCue _patientPartlyHealed;
+    [SerializeField] private SoundCue _coughFemale;
+    [SerializeField] private SoundCue _coughMale;
+    
     private List<PatientSpec> _currentPatients = new();
     private Queue<PatientSpec> _patientsWithSideEffects = new();
     private PatientSpec _selectedPatient;
@@ -49,6 +57,7 @@ public class PatientManager : GameplayManagerBase
     
     private Inventory Inventory => GameManager.Instance.Inventory;
     private GameData GameData => GlobalManager.Instance.GameData;
+    private SoundManager SoundManager => GlobalManager.Instance.SoundManager;
 
     public override void Init()
     {
@@ -60,6 +69,19 @@ public class PatientManager : GameplayManagerBase
     protected override void OnShow()
     {
         UpdateUI();
+        
+        SoundManager.PlaySound(_patientMusic);
+        SoundManager.PlaySound(_patientAmbient);
+        SoundManager.PlaySound(_coughFemale);
+        SoundManager.PlaySound(_coughMale);
+    }
+
+    protected override void OnHide()
+    {
+        SoundManager.StopSound(_patientMusic);
+        SoundManager.StopSound(_patientAmbient);
+        SoundManager.StopSound(_coughFemale);
+        SoundManager.StopSound(_coughMale);
     }
 
     public void GivePotionToPatient()
@@ -101,10 +123,12 @@ public class PatientManager : GameplayManagerBase
             sb.Append($"Since there was leftover effects, this patient will be back tomorrow with the following sickness: [{sickness.SicknessName}]\n");
 
             GameData.patientReturns += 1;
+            SoundManager.PlaySound(_patientPartlyHealed);
         }
         else
         {
             GameData.patientsFullyCured += 1;
+            SoundManager.PlaySound(_patientFullyHealed);
         }
 
         _selectedPatient = null;
@@ -178,7 +202,9 @@ public class PatientManager : GameplayManagerBase
     private IEnumerable<PatientSpec> CheckCurrentPatientsDeaths()
     {
         var deadPatients = _currentPatients
-            .Where(x => x.daysSick >= x.currentSickness.DaysToKill || x.clinicReturnCount >= _maxReturnsBeforeDeath)
+            .Where(x => 
+                x.daysSick >= x.currentSickness.DaysToKill || 
+                x.clinicReturnCount > _maxReturnsBeforeDeath)
             .ToList();
 
         foreach (var deadPatient in deadPatients)
